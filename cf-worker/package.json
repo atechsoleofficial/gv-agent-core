@@ -1,0 +1,1 @@
+{"description":"Agent Core v2 — Cloudflare Workers port (Growth Ventures Feature Funnel agent). Node version: ../agent-core","devDependencies":{"wrangler":"^4.0.0"},"name":"gv-agent-core-cf","private":true,"scripts":{"deploy":"wrangler deploy","dev":"wrangler dev","test":"node tests/test-scenario.mjs"},"type":"module","version":"2.0.0"}

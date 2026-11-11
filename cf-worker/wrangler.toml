@@ -1,0 +1,37 @@
+# GV Agent Core — Cloudflare Workers config
+# Deploy guide: DEPLOY-CF.md (dashboard Git import, step-by-step)
+name = "gv-agent-core"
+main = "src/worker.js"
+compatibility_date = "2025-02-01"
+
+# Console UI (public/) — Workers Static Assets.
+# run_worker_first: har request pehle worker se guzarti hai taake `/` par
+# login gate Node version ki tarah hi lage; files ASSETS binding se serve hoti hain.
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = true
+
+# App ka saara data aik KV namespace me (keys: db, knowledge, outbox).
+# DEPLOY SE PEHLE: Cloudflare dashboard → Storage & Databases → KV me namespace
+# bana kar us ki id yahan lagayen (preview_id local `wrangler dev` ke liye —
+# alag preview namespace bana kar us ki id, ya local test me yahi rehne dein,
+# wrangler dev KV ko local emulate karta hai).
+[[kv_namespaces]]
+binding = "GV_KV"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+preview_id = "REPLACE_WITH_KV_PREVIEW_ID"
+
+# Scheduler (Node ke setInterval ka badal):
+#  - "0 4 * * *"  = roz 04:00 UTC = 09:00 PKT → daily report (+ follow-up scan)
+#  - "5 * * * *"  = har ghante → follow-up due scan
+# Note: DAILY_REPORT_TIME sirf label hai; asal waqt is cron se fix hai.
+[triggers]
+crons = ["0 4 * * *", "5 * * * *"]
+
+# Ghair-hassas config. Secrets (ADMIN_PASS, SESSION_SECRET, GEMINI_API_KEY,
+# WHATSAPP_TOKEN waghera) yahan NA likhein — dashboard → Worker → Settings →
+# Variables and Secrets me "Secret" type se lagayen (local: .dev.vars).
+[vars]
+ADMIN_USER = "admin"
+DAILY_REPORT_TIME = "09:00"
